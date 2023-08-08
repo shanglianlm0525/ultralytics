@@ -126,7 +126,7 @@ class BaseTrainer:
         except Exception as e:
             raise RuntimeError(emojis(f"Dataset '{clean_url(self.args.data)}' error ❌ {e}")) from e
 
-        self.trainset, self.testset, self.ch = self.get_dataset(self.data)
+        self.trainset, self.testset = self.get_dataset(self.data)
         self.ema = None
 
         # Optimization utils init
@@ -236,9 +236,9 @@ class BaseTrainer:
 
         # Dataloaders
         batch_size = self.batch_size // max(world_size, 1)
-        self.train_loader = self.get_dataloader(self.trainset, self.ch, batch_size=batch_size, rank=RANK, mode='train')
+        self.train_loader = self.get_dataloader(self.trainset, self.args.ch, batch_size=batch_size, rank=RANK, mode='train')
         if RANK in (-1, 0):
-            self.test_loader = self.get_dataloader(self.testset, self.ch, batch_size=batch_size * 2, rank=-1, mode='val')
+            self.test_loader = self.get_dataloader(self.testset, self.args.ch, batch_size=batch_size * 2, rank=-1, mode='val')
             self.validator = self.get_validator()
             metric_keys = self.validator.metrics.keys + self.label_loss_items(prefix='val')
             self.metrics = dict(zip(metric_keys, [0] * len(metric_keys)))  # TODO: init metrics for plot_results()?
@@ -435,7 +435,7 @@ class BaseTrainer:
         """
         Get train, val path from data dict if it exists. Returns None if data format is not recognized.
         """
-        return data['train'], data.get('val') or data.get('test'), data.get('ch') or 3
+        return data['train'], data.get('val') or data.get('test')
 
     def setup_model(self):
         """

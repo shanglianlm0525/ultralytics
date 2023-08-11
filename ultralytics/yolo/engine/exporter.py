@@ -380,6 +380,7 @@ class Exporter:
         yaml_save(Path(f) / 'metadata.yaml', self.metadata)  # add metadata.yaml
         return f, None
 
+
     @try_export
     def export_paddle(self, prefix=colorstr('PaddlePaddle:')):
         """YOLOv8 Paddle export."""
@@ -393,6 +394,7 @@ class Exporter:
         pytorch2paddle(module=self.model, save_dir=f, jit_type='trace', input_examples=[self.im])  # export
         yaml_save(Path(f) / 'metadata.yaml', self.metadata)  # add metadata.yaml
         return f, None
+
 
     @try_export
     def export_coreml(self, prefix=colorstr('CoreML:')):
